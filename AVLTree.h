@@ -33,7 +33,7 @@ public:
     void insert(int);
 
     //rotate node left
-    std::shared_ptr<Node> balance(std::vector<std::shared_ptr<Node>> &, std::shared_ptr<Node>);
+    std::shared_ptr<Node> balance(std::vector<std::shared_ptr<Node>> &, int);
 
     std::shared_ptr<Node> rightRotate(std::shared_ptr<Node>);
     std::shared_ptr<Node> leftRotate(std::shared_ptr<Node>);

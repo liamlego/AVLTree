@@ -52,19 +52,21 @@ void AVLTree::insert(int data) {
         curr = currP->left;
     }
 
+    nodePath.push_back(curr);
+
     int leftHeight = height(root->left, 0);
     int rightHeight = height(root->right, 0);
 
-    std::cout << "Left: " << leftHeight << std::endl;
-    std::cout << "Right: " << rightHeight << std::endl;
-
     printTree(root, "");
+    std::cout << "---------" << std::endl;
 
     bool shouldRotate = (abs(leftHeight - rightHeight)) > 1;
 
 
     if (shouldRotate) {
-        root = balance(nodePath, curr);
+        
+        root = balance(nodePath, nodePath.size()-1);
+        
     }
 
 }
@@ -92,20 +94,93 @@ std::shared_ptr<AVLTree::Node> AVLTree::leftRotate(std::shared_ptr<Node> node) {
 }
 
 
-std::shared_ptr<AVLTree::Node> AVLTree::balance(std::vector<std::shared_ptr<Node>> &nodes, std::shared_ptr<Node> node) {
+std::shared_ptr<AVLTree::Node> AVLTree::balance(std::vector<std::shared_ptr<Node>> &nodes, int index) {
 
-    if (node == nullptr) {
-        return nullptr;
+    if (index-1 < 0) {
+        
+        int leftHeight = height(root->left, 0);
+        int rightHeight = height(root->right, 0);
+        
+        bool isBalanced = abs(leftHeight - rightHeight) <= 1;
+        
+        if (!isBalanced) {
+
+            if (leftHeight > rightHeight) {
+
+                if (root->left->right != nullptr && root->left->left == nullptr) {
+                    root->left = leftRotate(root->left);
+                }
+
+                root = rightRotate(root);
+                
+
+            } else {
+                
+                if (root->right->left != nullptr && root->right->right == nullptr) {
+                    root->right = rightRotate(root->right);
+                }
+
+                root = leftRotate(root);
+
+            }
+
+
+        }
+        
+        return root;
     }
 
-    int leftHeight = height(node->left, 0);
-    int rightHeight = height(node->right, 0);
+    int leftHeight = height(nodes[index]->left, 0);
+    int rightHeight = height(nodes[index]->right, 0);
 
-    
+    bool isBalanced = abs(leftHeight - rightHeight) <= 1;
+
+    std::shared_ptr<Node> curr = nodes[index];
+    std::shared_ptr<Node> parent = nodes[index-1];
+
+    if (!isBalanced) {
+
+        int leftHP = height(parent->left, 0);
+        int rightHP = height(parent->right, 0);
+
+        if (leftHeight > rightHeight) {
+            
+            // right rotate
+
+            if (curr->left->right != nullptr && curr->left->left == nullptr) {
+                curr->left = leftRotate(curr->left);    
+            }
+
+            if (leftHP > rightHP) {
+                parent->left = rightRotate(parent->left);
+            } else {
+                parent->right = rightRotate(parent->left);
+            }
+            
 
 
 
-    return node;
+        } else {
+
+            // left rotate
+            if (curr->right->left != nullptr && curr->right->right == nullptr) {
+                curr->right = rightRotate(curr->left);    
+            }
+
+            if (leftHP > rightHP) {
+                
+                parent->left = leftRotate(parent->left);
+            } else {
+                parent->right = leftRotate(parent->right);
+            }
+
+
+        }
+
+    } 
+
+    index--;
+    return balance(nodes, index); 
 }
 /*
 
